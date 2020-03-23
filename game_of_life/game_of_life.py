@@ -83,7 +83,34 @@ def create_grid(size, init_cell):
     return grid_list
 
 
-def change_generations(prev_cell):
+# 초기 세포(init_cell)를 initialize()에서 받아옴 -> 세포 변환을 change_generations에서 진행하고 결과 전달
+# -> change_grid()함수를 새로 생성해서 새로운 그리드 생성 -> 세포 변환 -> 그리드 생성 -> 반복
+def change_grid(next_cell):
+    return 0
+
+
+"""
+def to_do():
+    s, g, init_cell = initialize()  # initalize에서 init_cell 반환
+    next_grid = create_grid(s, init_cell)  # 초기 grid 생성
+    prev_grid = init_cell
+    
+    while g:  # generation 횟수가 남아있을 때 까지 반복
+        next_generation = change_generation(next_cell)  # 1.처음에 초기값 init_cell을 받아오고 다음 세대 생성, 4. 다음 세대 생성
+        next_grid = change_grid(prev_grid, next_generation)  # 2. 다음 세대를 이용해 그리드 변화
+        
+        next_cell = next_generation  # 3. next_cell에 next_generation을 그대로 반환
+        prev_grid = next_grid
+        g -= 1
+        if g == 0:
+            break
+            
+# change_grid 함수 생성
+# change_generation 함수 생성
+"""
+
+
+def change_generation(prev_cell):
     # 세대에 따라 셀의 변화
     # 네 개의 조건을 바탕으로 알고리즘 구현
     next_cell = []
@@ -107,6 +134,6 @@ if __name__ == '__main__':
     # initialize('plus.txt')  # 파일 이름과 세대를 입력할 경우 -> 파일에 정의된 state
 
     # 초기화
-    size, gen, init_cell = initialize()  # 사용자가 값을 입력하지 않을 경우
+    s, g, i = initialize()  # 사용자가 값을 입력하지 않을 경우
     # 그리드 생성
-    result = create_grid(size, init_cell)  # 배열을 이용해 그리드 생성
+    result = create_grid(s, i)  # 배열을 이용해 그리드 생성
