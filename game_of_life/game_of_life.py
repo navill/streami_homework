@@ -7,11 +7,7 @@ MAIN_GRID = []
 CONTAINER_GRID = []
 # default
 SIZE = [40, 80]
-
-
-# 중앙 셀을 기준으로 이웃을 검사하기 위해 사용
 ##################
-# size에 맞는 빈('chr(9633 -> □)') 2차 배열 구현
 
 
 def initialize(filename=None, gen=None):
