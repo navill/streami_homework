@@ -75,10 +75,13 @@ def create_grid(size, init_cell):
     :param size: 초기화된 grid의 크기
     :param init_cell: 초기화된 cell
     """
-    # size에 맞는 빈('_') 리스트 구현
-    grid_list = [[''] * size[0] for _ in range(size[1])]
+    # size에 맞는 빈('chr(9633 -> □)') 2차 배열 구현
+    grid_list = []
+    for _ in range(size[1]):
+        grid_list.append([''.join(chr(9633))] * size[0])
+
     for row, col in init_cell:
-        grid_list[row][col] = '*'
+        grid_list[row][col] = chr(9632)
     # default(80x40) 사이즈의 리스트 반환
     return grid_list
 
@@ -91,8 +94,8 @@ def change_grid(next_cell):
 
 """
 def to_do():
-    s, g, init_cell = initialize()  # initalize에서 init_cell 반환
-    next_grid = create_grid(s, init_cell)  # 초기 grid 생성
+    sizw, gen, init_cell = initialize()  # initalize에서 init_cell 반환
+    next_grid = create_grid(size, init_cell)  # 초기 grid 생성
     prev_grid = init_cell
     
     while g:  # generation 횟수가 남아있을 때 까지 반복
@@ -137,3 +140,4 @@ if __name__ == '__main__':
     s, g, i = initialize()  # 사용자가 값을 입력하지 않을 경우
     # 그리드 생성
     result = create_grid(s, i)  # 배열을 이용해 그리드 생성
+    print(result)
