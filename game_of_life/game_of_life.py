@@ -3,14 +3,12 @@ from os import system
 from copy import deepcopy
 from time import sleep
 import random
-import itertools
 
 ##################
 # MAIN_GRID: 화면에 뿌려질때 사용될 grid 변수
 MAIN_GRID = []
 # CONTAINER_GRID: 이전 세대 grid를 잠시 담고 있을 변수. 조건 연산에 사용됨
 CONTAINER_GRID = []
-GENERATION_NUMBER = 0
 write, flush = sys.stdout.write, sys.stdout.flush
 
 
@@ -34,7 +32,8 @@ def initialize(filename=None, gen=None):
                 contents = file_object.readlines()
                 contents = (content.split('\n')[0].split(' ') for content in contents)
                 # grid 높이 & 넓이
-                row, col = next(contents)
+                c_row, c_col = next(contents)
+                row, col = int(c_row), int(c_col)
 
                 # 만일 파일이 있는데 gen_number가 None일 경우 - 파일에 있는 세대 수 할당
                 if gen_number is None:
@@ -55,20 +54,18 @@ def initialize(filename=None, gen=None):
             sys.exit()
     # 파일이 없을 경우 -> random으로 초기화
     else:
-        """
-        임의 설정(진행중)
-        """
-        # 랜덤한 게임의 크기 - 최대 110x80
-        col = 80  # + 10 * random.randint(0, 3)
-        row = 40  # + 10 * random.randint(0, 4)
-        # 랜덤으로 생성할 셀 수 - 최대 전체 크기 1/2
-        num_rand_cell = random.randint(1, (col * row) // 2)
+        rand_num = [random.randint(1, 20) for i in range(3)]
+        random.shuffle(rand_num)
+        # 랜덤한 게임의 크기
+        col = 80 + 3 * rand_num[0]  # col 최대 크기: 140
+        row = 40 + 3 * rand_num[1]  # row 최대 크기: 100
 
-        # 생성 가능한 좌표의 리스트 - [19,19] ~ [21,21]  // 3x3=9칸에 임의로 세포 생성
-        init_cell = list(itertools.product(range(19, 22), repeat=2))
-        random.shuffle(init_cell)
-        init_cell = init_cell[:num_rand_cell]
-    return [int(row), int(col)], gen_number, init_cell
+        # 최대 row & col의 난수 생성
+        arry_rand_col = list(random.randint(20, col - 20) for _ in range(100))
+        arry_rand_row = list(random.randint(10, row - 10) for _ in range(100))
+
+        init_cell = list(zip(arry_rand_row, arry_rand_col))
+    return [row, col], gen_number, init_cell
 
 
 def create_grid(grid_size, init_cell):
@@ -78,14 +75,12 @@ def create_grid(grid_size, init_cell):
     """
     global CONTAINER_GRID
 
-    print(MAIN_GRID)
     for _ in range(grid_size[0]):
         MAIN_GRID.append([''.join(chr(9633))] * grid_size[1])
 
     CONTAINER_GRID = deepcopy(MAIN_GRID)
 
     for x, y in init_cell:
-        print(x, y)
         MAIN_GRID[x][y] = '■'  # chr(9632)
         CONTAINER_GRID[x][y] = '■'  # chr(9632)
 
@@ -160,10 +155,9 @@ def visualize(gen):
     """
     :param <int> gen: 진행할 세대의 수
     """
-    global GENERATION_NUMBER
 
     # 0세대 세포로 시작
-    gen_number = GENERATION_NUMBER
+    gen_number = 0
     zero_generation = '\n'.join([''.join(i) for i in MAIN_GRID])
     write(zero_generation)
     write(f'\nGame of Life를 시작합니다. 현재 {gen_number} 세대 세포입니다.\n')
@@ -173,37 +167,39 @@ def visualize(gen):
     sleep(2)
 
     while True:
-        # 순환문이 시작될 때 남은 빈 배열이 출력되는 문제 -> flush + system('clear')로 해결
-        flush()  # 버퍼에 남아있을 수 있는 모든 요소 배출
-        system('clear')  # 화면 정리
-
-        # 세대 진행 수
-        gen_number += 1
         # 세포 변화 시작
         is_live = change_generation()
-        generations = '\n'.join([''.join(i) for i in MAIN_GRID])
 
-        write(generations)
-        write(f'\n{gen_number} - 세대\n')
-        GENERATION_NUMBER = gen_number
+        # 세포가 하나라도 살아있을 경우
+        if is_live is True:
+            flush()  # 버퍼에 남아있을 수 있는 모든 요소 배출
+            system('clear')  # 화면 정리
 
+            gen_number += 1
+
+            generations = '\n'.join([''.join(i) for i in MAIN_GRID])
+            write(generations)
+            write(f'\n{gen_number} - 세대\n')
+        # 모두 죽어있을 경우 종료
+        else:
+            write('모든 세포가 죽어있습니다.\n')
+            break
         # 사용자가 쉘에서 파일명을 입력하지 않을 경우 gen은 None
         # => 첫 번째 조건이 False가 되면서 break 라인까지 도달하지 않는다. -> 무한 루프
-        # => 어떤 형태로든 int형의 gen이 입력되고(1) 한 개의 셀이라도 살아있으며(2) 그 수 만큼 반복할 때 까지(3) 진행
+        # => 어떤 형태로든 int형의 gen이 입력되고 그 수 만큼 반복할 때 까지 진행
         # 위 조건을 벗어날 경우 무한 루프
-        if (gen.__class__ is int) and (is_live is True) and (gen <= gen_number):
+        if (gen.__class__ is int) and (gen <= gen_number):
             break
 
         # 화면에 출력 후 대기
         sleep(1)
+    return gen_number
 
 
 def main(sys_args):
     """
     :param <list> sys_args: 쉘에서 입력된 인자값
     """
-    global GENERATION_NUMBER
-
     filename = None
     gen = None
 
@@ -232,13 +228,14 @@ def main(sys_args):
     create_grid(grid_size, init_cell_list)
 
     # 화면 표시 - 세대 수만큼 진행
+
+    # gen_number: 파일이 없을 경우 None, 파일이 있고 세대 수를 사용자가 인가할경우 정수형 숫자가 인가된다.
     try:
-        # gen_number: 파일이 없을 경우 None, 파일이 있고 세대 수를 사용자가 인가할경우 정수형 숫자가 인가된다.
-        visualize(gen_number)
+        last_gen = visualize(gen_number)
     except KeyboardInterrupt:
-        write('사용자가 게임을 중지하였습니다.\n')
-    finally:
-        write(f'게임의 마지막 세포는 {GENERATION_NUMBER}세대 세포입니다.\n')
+        write('사용자에 의해 게임이 종료되었습니다.\n')
+    else:
+        write(f'게임이 {last_gen}세대까지 진행되었습니다.\n')
         write(f'Game of life를 종료합니다.\n')
 
 
