@@ -133,14 +133,15 @@ def change_generation():
     global CONTAINER_GRID
     old_grid = CONTAINER_GRID
     is_live = False
+
     # row부터 진행 -> cache hit 유도
     for row in range(len(old_grid)):
         for col, cell in enumerate(old_grid[row]):
-            # 주변 살아있는 셀 개수
+            # 주변 살아있는 셀 개수 체크
             live_neighbor_cell_num = check_live_neighbor(row, col)
             # 살아있는 셀
             if '■' == cell:
-                # 세포가 하나라도 살아있을 경우 플래그는 True가 된다.
+                # 전체 셀에서 세포가 하나라도 살아있을 경우 True, 그렇지 않을 경우 False
                 is_live = True
                 if live_neighbor_cell_num == 1 or live_neighbor_cell_num == 0:  # 조건1
                     MAIN_GRID[row][col] = '□'  # die
@@ -175,18 +176,19 @@ def visualize(gen):
         # 순환문이 시작될 때 남은 빈 배열이 출력되는 문제 -> flush + system('clear')로 해결
         flush()  # 버퍼에 남아있을 수 있는 모든 요소 배출
         system('clear')  # 화면 정리
+
         # 세대 진행 수
         gen_number += 1
         # 세포 변화 시작
         is_live = change_generation()
         generations = '\n'.join([''.join(i) for i in MAIN_GRID])
+
         write(generations)
         write(f'\n{gen_number} - 세대\n')
         GENERATION_NUMBER = gen_number
 
-        # 조건에 따라 gen이 int가 아닐 수 있다.
-        # -> 사용자가 쉘에서 인수를 인가하지 않을 경우 gen은 NoneType이 된다.
-        #   => 첫 번째 조건이 False가 되면서 break 라인까지 도달하지 않는다. -> 무한 루프
+        # 사용자가 쉘에서 파일명을 입력하지 않을 경우 gen은 None
+        # => 첫 번째 조건이 False가 되면서 break 라인까지 도달하지 않는다. -> 무한 루프
         # => 어떤 형태로든 int형의 gen이 입력되고(1) 한 개의 셀이라도 살아있으며(2) 그 수 만큼 반복할 때 까지(3) 진행
         # 위 조건을 벗어날 경우 무한 루프
         if (gen.__class__ is int) and (is_live is True) and (gen <= gen_number):
@@ -197,6 +199,9 @@ def visualize(gen):
 
 
 def main(sys_args):
+    """
+    :param <list> sys_args: 쉘에서 입력된 인자값
+    """
     global GENERATION_NUMBER
 
     filename = None
@@ -212,10 +217,10 @@ def main(sys_args):
             write('세대 수는 int형을 입력해주세요.\n')
             return None
         except IndexError:
-            # 조건: 파일이름과 세대수는 있을수도 없을수도 있다.
+            # 파일이름과 세대수는 있을수도 없을수도 있다.
+            # 있을경우 변수에 할당, 없을 경우 무시(None 유지)
             pass
-        # else:
-        #     gen = 0
+
     # 입력값이 4개 이상일 경우
     else:
         write(f'입력하실 수 있는 변수의 개수가 초가되었습니다.\n')
@@ -225,10 +230,10 @@ def main(sys_args):
     grid_size, gen_number, init_cell_list = initialize(filename, gen)
     # 초기 그리드 생성
     create_grid(grid_size, init_cell_list)
-    # 화면 표시 - 세대 수만큼 진행
 
+    # 화면 표시 - 세대 수만큼 진행
     try:
-        # 파일이 없을 경우 None, 파일이 있고 세대 수를 사용자가 인가할경우 정수형 숫자가 인가된다.
+        # gen_number: 파일이 없을 경우 None, 파일이 있고 세대 수를 사용자가 인가할경우 정수형 숫자가 인가된다.
         visualize(gen_number)
     except KeyboardInterrupt:
         write('사용자가 게임을 중지하였습니다.\n')
