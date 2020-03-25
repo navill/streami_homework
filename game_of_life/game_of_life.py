@@ -1,4 +1,7 @@
+import sys
+from os import system
 from copy import deepcopy
+from time import sleep
 
 ##################
 # MAIN_GRID: 화면에 뿌려질때 사용될 grid 변수
@@ -7,6 +10,9 @@ MAIN_GRID = []
 CONTAINER_GRID = []
 # default
 SIZE = [40, 80]
+LIVE_FLAG = False
+
+
 ##################
 
 
@@ -48,8 +54,8 @@ def initialize(filename=None, gen=None):
         임의 설정(진행중)
         """
         # 랜덤한 게임의 크기 - 최대 110x80
-        width = 80 + 10 * random.randint(0, 3)
-        height = 40 + 10 * random.randint(0, 4)
+        width = 80  # + 10 * random.randint(0, 3)
+        height = 40  # + 10 * random.randint(0, 4)
         # 랜덤으로 생성할 셀 수 - 최대 전체 크기 1/2
         num_rand_cell = random.randint(1, (width * height) // 2)
         # 랜덤 세대 수(무한 반복?)
@@ -65,13 +71,13 @@ def initialize(filename=None, gen=None):
 
 def create_grid(grid_size, init_cell):
     """
-    :param <list> size: 화면에 표시될 테이블의 크기(<int>width, <int>height)
+    :param <list> grid_size: 화면에 표시될 테이블의 크기(<int>width, <int>height)
     :param <list> init_cell: 세포들의('■') 위치가 들어있는 리스트
     """
     global CONTAINER_GRID
 
-    for _ in range(grid_size[0]):
-        MAIN_GRID.append([''.join(chr(9633))] * grid_size[1])
+    for _ in range(grid_size[1]):
+        MAIN_GRID.append([''.join(chr(9633))] * grid_size[0])
     CONTAINER_GRID = deepcopy(MAIN_GRID)
 
     for x, y in init_cell:
@@ -87,7 +93,7 @@ def check_live_neighbor(cell_row, cell_col):
     :param <int> cell_row: 체크하고자 하는 셀의 행
     :param <int> cell_col: 체크하고자 하는 셀의 열
     """
-    live_cell_num = 0
+    count_live_cell = 0
     # 이웃 셀 좌표 생성
     for row in [cell_row - 1, cell_row, cell_row + 1]:
         for col in [cell_col - 1, cell_col, cell_col + 1]:
@@ -97,13 +103,13 @@ def check_live_neighbor(cell_row, cell_col):
             try:
                 # 주변에 살아있는 세포가 있을 경우
                 if CONTAINER_GRID[row][col] == '■':
-                    live_cell_num += 1
+                    count_live_cell += 1
             # size를 벗어나는 index는 무시
             except Exception as e:
                 # print(f'{e}: 검색이 배열의 범위를 벗어났습니다.')
                 pass
 
-    return live_cell_num
+    return count_live_cell
 
 
 """
@@ -119,7 +125,7 @@ def check_live_neighbor(cell_row, cell_col):
 
 
 def change_generation():
-    global CONTAINER_GRID
+    global CONTAINER_GRID, LIVE_FLAG
     old_grid = CONTAINER_GRID
 
     # row부터 진행 -> cache hit 유도
@@ -129,6 +135,8 @@ def change_generation():
             live_neighbor_cell_num = check_live_neighbor(row, col)
             # 살아있는 셀
             if '■' == cell:
+                # 세포가 하나라도 살아있을 경우 플래그는 True가 된다.
+                LIVE_FLAG = True
                 if live_neighbor_cell_num == 1 or live_neighbor_cell_num == 0:  # 조건1
                     MAIN_GRID[row][col] = '□'  # die
                 elif live_neighbor_cell_num > 3:  # 조건2
@@ -141,31 +149,52 @@ def change_generation():
     CONTAINER_GRID = deepcopy(MAIN_GRID)
 
 
-def visualize():
-    # 화면에 출력
-    pass
+def visualize(gen):
+    """
+    :param <int> gen: 진행될 세대의 수
+    """
+    write, flush = sys.stdout.write, sys.stdout.flush
+
+    # 0세대 세포로 시작
+    gen_counting = 0
+    zero_generation = '\n'.join([''.join(i) for i in MAIN_GRID])
+    write(zero_generation)
+    write(f'\nGame of Life를 시작합니다. 현재 {gen_counting} 세대 세포입니다.\n')
+    flush()
+
+    # 초기화면 2초 대기
+    sleep(2)
+    while True:
+        # 순환문이 시작될 때 남은 빈 배열이 출력되는 문제 -> flush + system('clear')로 해결
+        flush()  # 버퍼에 남아있을 수 있는 모든 요소 배출
+        system('clear')  # 화면 정리
+        # 세대 진행 수
+        gen_counting += 1
+        # 세포 변화 시작
+        change_generation()
+
+        generations = '\n'.join([''.join(i) for i in MAIN_GRID])
+        write(generations)
+        write(f'\n{gen_counting} 세대 세포\n')
+        # 순환문이 세대 수만큼 진행될 때 중지
+        if gen == gen_counting:
+            break
+        # 1초 간격으로 화면에 셀의 변화 표시
+        sleep(1)
+
+    write(f'Game of life를 종료합니다.\n')
 
 
 def main():
-    # 게임 실행
-    # 게임 완료 후 txt파일로 저장
-    pass
+    # 1. 파일과 세대수를 입력할 경우 - filename, gen
+    # 2. 파일만 입력할 경우 - filename
+    # 3. 아무것도 입력하지 않을 경우
+    grid_size, gen_num, init_cell_list = initialize('plus.txt')  # 사용자가 값을 입력하지 않을 경우
+    # 초기 그리드 생성
+    create_grid(grid_size, init_cell_list)
+    # 화면 표시 - 세대 수만큼 진행
+    visualize(gen_num)
 
 
 if __name__ == '__main__':
-    # 초기화
-    grid_size, g, init_cell_list = initialize('plus.txt')  # 사용자가 값을 입력하지 않을 경우
-
-    # 초기 그리드 생성
-    create_grid(grid_size, init_cell_list)
-    test_result = []
-    for i in MAIN_GRID:
-        test_result.append(''.join(i))
-    print(test_result)
-    # 세포의 세대별 변화 출력
-    for _ in range(8):
-        change_generation()
-        test_result = []
-        for i in MAIN_GRID:
-            test_result.append(''.join(i))
-        print(test_result)
+    main()
