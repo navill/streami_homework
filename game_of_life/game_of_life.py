@@ -1,3 +1,4 @@
+import os
 import sys
 from os import system
 from copy import deepcopy
@@ -32,7 +33,6 @@ def initialize(filename=None):
                 # grid 높이 & 넓이
                 c_row, c_col = next(contents)
                 row, col = int(c_row), int(c_col)
-
                 # 셀의 개수는 건너뜀
                 next(contents)
 
@@ -166,7 +166,8 @@ def visualize(gen=None):
     count_gen_num = 0
     zero_generation = '\n'.join([''.join(i) for i in MAIN_GRID])
     write(zero_generation)
-    write(f'\nGame of Life를 시작합니다. 현재 {count_gen_num} 세대 세포입니다.\n')
+    text = '\nGame of Life를 시작합니다. 현재 {0} 세대 세포입니다.\n'.format(count_gen_num)
+    write(text)
     flush()
 
     # 초기화면 2초 대기
@@ -184,13 +185,14 @@ def visualize(gen=None):
         live_cells_row_col, num_live_cell = change_generation(do_save)
 
         flush()  # 버퍼에 남아있을 수 있는 모든 요소 배출
-        system('clear')  # 화면 정리
+        system('cls' if os.name == 'nt' else 'clear')
+        # system('cls')  # 화면 정리
 
         generations = '\n'.join([''.join(i) for i in MAIN_GRID])
         write(generations)
         # 세포가 하나라도 살아있을 경우
         if num_live_cell:
-            write(f'\n{count_gen_num} - 세대\n')
+            write('\n{0} - 세대\n'.format(count_gen_num))
         # 모두 죽어있을 경우 종료
         else:
             write('\n모든 세포가 죽어있습니다.\n')
@@ -235,7 +237,7 @@ def main(sys_args):
 
     # 입력값이 4개 이상일 경우
     else:
-        write(f'입력하실 수 있는 변수의 개수가 초가되었습니다.\n')
+        write('입력하실 수 있는 변수의 개수가 초가되었습니다.\n')
         return None
 
     # 초기화: 창의 크기, 초기 셀의 행렬
@@ -252,25 +254,25 @@ def main(sys_args):
             import datetime
             now = datetime.datetime.now().strftime('D%m_%d_T%H:%M:%S')
             # 마지막 세대 상태 저장
-            with open(f'dump/dump_{now}.txt', 'w+') as file_object:
+            with open('dump/dump_{0}.txt', 'w+'.format(now)) as file_object:
                 # size: grid_size from initialize()
                 # gen: gen from sys.argv
                 # survive_cell: live_cells_row_col from visualize()
-                size = f'{grid_size[0]} {grid_size[1]}\n'
+                size = '{0} {1}.\n'.format(grid_size[0], grid_size[1])
                 # grid 크기
                 file_object.write(size)
                 # 셀 개수
-                file_object.write(f'{live_cells_num}\n')
+                file_object.write('{0}\n'.format(live_cells_num))
                 # 셀 행렬 저장
                 for row, col in live_cells_row_col:
-                    file_object.write(f'{row} {col}\n')
+                    file_object.write('{0} {1}\n'.format(row, col))
                 file_object.write('\n')
 
     except KeyboardInterrupt:
         write('사용자에 의해 게임이 종료되었습니다.\n')
     else:
-        write(f'게임이 {last_gen}세대까지 진행되었습니다.\n')
-        write(f'Game of life를 종료합니다.\n')
+        write('게임이 {0}세대까지 진행되었습니다.\n'.format(last_gen))
+        write('Game of life를 종료합니다.\n')
 
 
 if __name__ == '__main__':
