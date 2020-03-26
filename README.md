@@ -40,6 +40,8 @@
 
   1. shell terminal에서 **./gol_set.sh** 파일 실행합니다.
 
+     ![run_gol_set](images/run_gol_set.png)
+
   2. 게임을 실행하기 위한 설정이 모두 완료되면 아래의 명령어를 통해 게임 폴더로 이동합니다.
 
      ```python
