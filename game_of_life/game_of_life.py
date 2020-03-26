@@ -17,11 +17,12 @@ write, flush = sys.stdout.write, sys.stdout.flush
 
 def initialize(filename=None):
     """
-    파일과 세대는 사용자가 선택할 수 있다.
     :param <str> filename: 사용될 파일 이름(plus.txt)
     """
 
+    # 초기화된 셀들을 저장할 리스트
     list_init_cell = []
+
     # 파일이 있을 경우 -> 파일을 기반으로 초기화
     if filename:
         try:
@@ -32,8 +33,8 @@ def initialize(filename=None):
                 c_row, c_col = next(contents)
                 row, col = int(c_row), int(c_col)
 
-                # 셀의 개수를 파일에서 받아온다.
-                num_cell_init = int(next(contents).pop())
+                # 셀의 개수는 건너뜀
+                next(contents)
 
                 # 파일에 포함된 초기 세포 좌표
                 for content in contents:
@@ -55,7 +56,6 @@ def initialize(filename=None):
         arry_rand_row = list(random.randint(10, row - 10) for _ in range(100))
 
         list_init_cell = list(zip(arry_rand_row, arry_rand_col))
-        # num_cell_init = len(list_init_cell)
 
     return [row, col], list_init_cell
 
@@ -76,8 +76,6 @@ def create_grid(grid_size, list_init_cell):
         MAIN_GRID[x][y] = '■'  # chr(9632)
         CONTAINER_GRID[x][y] = '■'  # chr(9632)
 
-    # return list_init_cell
-
 
 # 주변에 몇 개의 세포가 살아있는지 카운팅
 def check_live_neighbor(cell_row, cell_col):
@@ -97,7 +95,7 @@ def check_live_neighbor(cell_row, cell_col):
                 if CONTAINER_GRID[row][col] == '■':
                     count_live_cell += 1
             # size를 벗어나는 index는 무시
-            except Exception as e:
+            except IndexError as e:
                 # print(f'{e}: 검색이 배열의 범위를 벗어났습니다.')
                 pass
 
@@ -126,12 +124,15 @@ def change_generation(do_save):
     live_cells_row_col = []
 
     num_gen_cell = 0  # 순환문을 돌며 살아있는 셀 카운트
+
     # row부터 진행 -> cache hit 유도
     for row in range(len(old_grid)):
         for col, cell in enumerate(old_grid[row]):
             cells_in_loop = False
+
             # 주변 살아있는 셀 개수 체크
             live_neighbor_cell_num = check_live_neighbor(row, col)
+
             # 살아있는 셀
             if '■' == cell:
                 if live_neighbor_cell_num == 1 or live_neighbor_cell_num == 0:  # 조건1
@@ -182,19 +183,20 @@ def visualize(gen=None):
         # 세포 변화 시작 -> 살아있는 셀 리스트 반환
         live_cells_row_col, num_live_cell = change_generation(do_save)
 
-        # 0이 아닐 경우(세포가 하나라도 살아있을 경우)
-        if num_live_cell:
-            flush()  # 버퍼에 남아있을 수 있는 모든 요소 배출
-            system('clear')  # 화면 정리
+        flush()  # 버퍼에 남아있을 수 있는 모든 요소 배출
+        system('clear')  # 화면 정리
 
-            # 세포가 하나라도 살아있을 경우만 다음 세대로 넘어감
-            generations = '\n'.join([''.join(i) for i in MAIN_GRID])
-            write(generations)
+        generations = '\n'.join([''.join(i) for i in MAIN_GRID])
+        write(generations)
+        # 세포가 하나라도 살아있을 경우
+        if num_live_cell:
             write(f'\n{count_gen_num} - 세대\n')
         # 모두 죽어있을 경우 종료
         else:
-            write('모든 세포가 죽어있습니다.\n')
+            write('\n모든 세포가 죽어있습니다.\n')
+            count_gen_num -= 1
             break
+
         # 사용자가 쉘에서 파일명을 입력하지 않을 경우 gen은 None
         # => 첫 번째 조건이 False가 되면서 break 라인까지 도달하지 않는다. -> 무한 루프
         # => int형의 gen이 입력되고 그 수 만큼 반복할 때 까지 진행
@@ -240,17 +242,13 @@ def main(sys_args):
     grid_size, init_cell_list = initialize(filename)
     # 초기 그리드 생성
     create_grid(grid_size, init_cell_list)
-    print('main try')
     try:
         # gen: 세대 수를 사용자가 인가할 경우 정수형 숫자가 인가/그렇지 않을 경우 None
         last_gen, live_cells_row_col = visualize(gen)  # 마지막 세대의 수, 살아남은 셀 좌표를 반환
         live_cells_num = len(live_cells_row_col)
-        print('main try if')
-        print(live_cells_num)
         if live_cells_num >= 1:
             import datetime
             now = datetime.datetime.now().strftime('D%m_%d_T%H:%M:%S')
-            print('main try if with')
 
             with open(f'dump/dump_{now}.txt', 'w+') as file_object:
                 # size: grid_size from initialize()
