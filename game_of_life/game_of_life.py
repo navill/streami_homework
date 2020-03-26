@@ -116,7 +116,7 @@ def check_live_neighbor(cell_row, cell_col):
 
 def change_generation(do_save):
     """
-    :param <boolean> do_save: 현재 살아있는 셀을 저장할지 여부
+    :param <boolean> do_save: 현재 세대에서 살아있는 셀을 저장할지 여부 판단
     """
     global CONTAINER_GRID
 
@@ -246,10 +246,12 @@ def main(sys_args):
         # gen: 세대 수를 사용자가 인가할 경우 정수형 숫자가 인가/그렇지 않을 경우 None
         last_gen, live_cells_row_col = visualize(gen)  # 마지막 세대의 수, 살아남은 셀 좌표를 반환
         live_cells_num = len(live_cells_row_col)
+
+        # 살아있는 셀이 한개라도 있을 경우
         if live_cells_num >= 1:
             import datetime
             now = datetime.datetime.now().strftime('D%m_%d_T%H:%M:%S')
-
+            # 마지막 세대 상태 저장
             with open(f'dump/dump_{now}.txt', 'w+') as file_object:
                 # size: grid_size from initialize()
                 # gen: gen from sys.argv
@@ -263,6 +265,7 @@ def main(sys_args):
                 for row, col in live_cells_row_col:
                     file_object.write(f'{row} {col}\n')
                 file_object.write('\n')
+
     except KeyboardInterrupt:
         write('사용자에 의해 게임이 종료되었습니다.\n')
     else:
