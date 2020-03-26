@@ -14,7 +14,7 @@
 
 
 
-### Technology [#](#category)
+### Technology[#](#category)
 
 **Language**: Python 3.5
 
@@ -26,7 +26,7 @@
 
 
 
-### 설치 및 사용법 [#](#category)
+### 설치 및 사용법[#](#category)
 
 **유의사항**
 
@@ -72,7 +72,7 @@
 
 
 
-### 주요 함수 [#](#category)
+### 주요 함수[#](#category)
 
 - **전체 흐름** [#](#category)
 
@@ -123,4 +123,6 @@
             - 저장될 파일명은 'dump/dump_D00_T00:00:00.txt'로 저장됩니다.
 
             
+
+
 
