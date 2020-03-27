@@ -110,7 +110,7 @@
 - **화면 출력** [#](#category)
   
     - **[def visualize(gen)](https://github.com/navill/streami_homework/blob/a864384900a4ae99e98b4e1b498690f2171fc3d2/game_of_life/game_of_life.py#L159)**
-        - 셀의 변화를 표현하기 위해 **sys.stdout.write()**를 이용하여 쉘에 그립니다.
+        - 변화된 셀을 화면에 출력하기 위한 함수입니다.
         - 입력된 세대 수에 맞게 반복문이 동작합니다.
         - 세대수가 입력되지 않을 경우 무한 반복 됩니다.
     
@@ -122,7 +122,7 @@
 
         - 게임 동작에 필요한 함수를 실행하고, 세대가 입력될 경우 마지막 세대의 상태를 저장하는 기능을 포함합니다.
 
-            - 저장될 파일명은 'dump/dump_D00_T00:00:00.txt'로 저장됩니다.
+            - 파일은 '/streami/game_of_life/dump' 디렉토리에 저장됩니다.
 
             
 
