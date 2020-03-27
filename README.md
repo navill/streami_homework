@@ -68,7 +68,7 @@
 
      - 입력한 세대 수 만큼 게임이 진행되고 이때 살아남아 있는 세포들의 상태는 **./game_of_life/dump** 폴더에 텍스트 파일로 저장됩니다.
 
-  4. 입력한 세포가 세대가 진행되는동안 살아있지 못하면 게임은 종료됩니다.
+  4. 입력한 세포가 게임이 진행되는동안 살아있지 못하면 게임은 종료됩니다.
 
   5. **모든 세포가 죽거나** **'ctrl+c'** 키를 누를 경우 게임은 종료됩니다.
 
@@ -84,39 +84,39 @@
 
 - **초기 설정** [#](#category)
 
-    - **[def initialize(filename, genenration)](https://github.com/navill/streami_homework/blob/bdbbe28bc3f91e8c8bf73a1b8ad0637157c5a992/game_of_life/game_of_life.py#L18)**
+    - **[def initialize(filename, genenration)](https://github.com/navill/streami_homework/blob/a864384900a4ae99e98b4e1b498690f2171fc3d2/game_of_life/game_of_life.py#L18)**
         - 사용자가 입력한 설정에 따라 초기값 설정합니다.
         - 입력이 없을 경우 무작위 상태로 게임이 셋팅됩니다.
 
 - **세포의 세대별 변화 처리** [#](#category)
 
-    - **[def create_grid(grid_size, init_cell)](https://github.com/navill/streami_homework/blob/bdbbe28bc3f91e8c8bf73a1b8ad0637157c5a992/game_of_life/game_of_life.py#L63)**
+    - **[def create_grid(grid_size, init_cell)](https://github.com/navill/streami_homework/blob/a864384900a4ae99e98b4e1b498690f2171fc3d2/game_of_life/game_of_life.py#L62)**
 
         - 0세대 셀이 적용된 메인 그리드를 생성합니다.
 
         - 전체 표의 크기는 grid_size에 의해 정해집니다.
 
-            (사용자가 아무런 값을 입력하지 않을 경우 창은 최대 140x100까지 커질 수 있습니다.)
+            (사용자가 아무런 값을 입력하지 않을 경우 창은 최대 140x100까지 커질 수 있습니다. 최소 크기는 80x40입니다.)
 
-    - **[def check_live_neighbor(cell_row, cell_col)](https://github.com/navill/streami_homework/blob/bdbbe28bc3f91e8c8bf73a1b8ad0637157c5a992/game_of_life/game_of_life.py#L81)**
+    - **[def check_live_neighbor(cell_row, cell_col)](https://github.com/navill/streami_homework/blob/a864384900a4ae99e98b4e1b498690f2171fc3d2/game_of_life/game_of_life.py#L80)**
 
         - 한 개의 셀을 중심으로 주변을 순회하면서 살아있는 셀을 개수를 파악합니다.
 
-    - **[def change_generation()](https://github.com/navill/streami_homework/blob/bdbbe28bc3f91e8c8bf73a1b8ad0637157c5a992/game_of_life/game_of_life.py#L117)**
+    - **[def change_generation()](https://github.com/navill/streami_homework/blob/a864384900a4ae99e98b4e1b498690f2171fc3d2/game_of_life/game_of_life.py#L105)**
       
       - 전체 셀을 순환하며 Game of Life의 게임 규칙에 맞게 셀을 활성화하거나 비활성화 합니다.
         - 위 과정 중 게임의 모든 셀이 죽었는지 판별합니다.
 
 - **화면 출력** [#](#category)
   
-    - **[def visualize(gen)](https://github.com/navill/streami_homework/blob/bdbbe28bc3f91e8c8bf73a1b8ad0637157c5a992/game_of_life/game_of_life.py#L160)**
+    - **[def visualize(gen)](https://github.com/navill/streami_homework/blob/a864384900a4ae99e98b4e1b498690f2171fc3d2/game_of_life/game_of_life.py#L159)**
         - 셀의 변화를 표현하기 위해 **sys.stdout.write()**를 이용하여 쉘에 그립니다.
         - 입력된 세대 수에 맞게 반복문이 동작합니다.
         - 세대수가 입력되지 않을 경우 무한 반복 됩니다.
     
 - **메인 함수** [#](#category)
 
-    - **[def main(sys_args)](https://github.com/navill/streami_homework/blob/bdbbe28bc3f91e8c8bf73a1b8ad0637157c5a992/game_of_life/game_of_life.py#L212)**
+    - **[def main(sys_args)](https://github.com/navill/streami_homework/blob/bdbbe28bc3f91e8c8bf73a1b8ad0637157c5a992/game_of_life/game_of_life.py#L211)**
 
         - shell에서 인가된 두 개의 변수(파일 이름과 세대 수)를 이용해 게임을 초기화하고 실행시키기 위한 함수입니다.
 
